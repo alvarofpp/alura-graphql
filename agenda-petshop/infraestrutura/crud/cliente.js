@@ -2,19 +2,38 @@ const executaQuery = require('../database/queries')
 
 class Cliente {
   lista() {
-    const sql = 'SELECT * FROM Clientes'
+    const sql = 'SELECT * FROM Clientes; SELECT * FROM Pets'
 
-    return executaQuery(sql)
+    return executaQuery(sql).then((dados) => {
+      const clientes = dados[0]
+      const pets = dados[1]
+
+      return clientes.map((cliente) => {
+        const petsClientes = pets.filter((pet) => pet.donoId === cliente.id)
+        return ({
+          ...cliente,
+          pets: petsClientes
+        })
+      })
+    })
   }
 
   buscaPorId(id) {
-    const sql = `SELECT * FROM Clientes WHERE id=${id}`
+    const sql = `SELECT * FROM Clientes WHERE id=${id}; SELECT * FROM Pets WHERE donoId=${id}`
 
-    return executaQuery(sql).then((clientes) => clientes[0])
+    return executaQuery(sql).then((dados) => {
+      const cliente = dados[0][0]
+      const pets = dados[1]
+
+      return ({
+        ...cliente,
+        pets: pets.filter((pet) => pet.donoId = id)
+      })
+    })
   }
 
   adiciona(item) {
-    const { nome, cpf } = item
+    const {nome, cpf} = item
     const sql = `INSERT INTO Clientes(nome, CPF) VALUES('${nome}', '${cpf}')`
 
     return executaQuery(sql).then((resposta) => ({
@@ -25,7 +44,7 @@ class Cliente {
   }
 
   atualiza(novoItem) {
-    const { id, nome, cpf } = novoItem
+    const {id, nome, cpf} = novoItem
     const sql = `UPDATE Clientes SET nome='${nome}', CPF='${cpf}' WHERE id=${id}`
 
     return executaQuery(sql).then(() => novoItem)
