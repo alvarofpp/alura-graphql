@@ -13,16 +13,19 @@ conexao.connect(erro => {
   Tabelas.init(conexao)
 })
 const Clientes = new Operacoes('cliente')
+const Pets = new Operacoes('pet')
 const resolvers = {
   Query: {
     status: () => 'Servidor rodando!',
     clientes: () => Clientes.lista(),
-    cliente: (root, params) => Clientes.buscaPorId(params.id)
+    cliente: (root, params) => Clientes.buscaPorId(params.id),
+    pets: () => Pets.lista(),
   },
   Mutation: {
     adicionarCliente: (root, params) => Clientes.adiciona(params),
     atualizarCliente: (root, params) => Clientes.atualiza(params),
-    deletarCliente: (root, params) => Clientes.deleta(params.id)
+    deletarCliente: (root, params) => Clientes.deleta(params.id),
+    adicionarPet: (root, params) => Pets.adiciona(params),
   }
 }
 
